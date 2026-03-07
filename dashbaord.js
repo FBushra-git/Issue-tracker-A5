@@ -16,22 +16,51 @@ const toggleSpinner = (show)=>{
 };
 
 // Issues from API
-const loadIssues = async()=>{
+const loadIssues = ()=>{
     toggleSpinner(true);
-    try{
-        const res = await fetch(API);
-        const data = await res.json();
-        allissues=data.data;
-
-        // ui showing
+    
+    fetch(API)
+    .then(res => res.json())
+    .then(json =>{
+        allissues = json.data;
         displayIssues(allissues);
+        toggleSpinner(false);
+    })
 
-    }
-    catch(err){
+    .catch(err=>{
+        
         console.error("API Load error:",err);
+        toggleSpinner(false);
+});
 
-    }
+    
 
-    toggleSpinner(false);
 
 };
+// display issues cards in UI
+const displayIssues=(issues)=>{
+    // empty container
+    container.innerHTML="";
+    // total issues show
+    count.innerText = issues.length;
+
+    container.className =
+    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6";
+
+    // loop for every element
+    issues.forEach(issue =>{
+
+        // for priority high/meddium/low
+        let priorityClass = "";
+
+        if(issue.priority === "high"){
+            priorityClass = "bg-red-100 text-red-600";
+        }
+        else if(issue.priority === "medium"){
+            priorityClass = "bg-yellow-100 text-yellow-600";
+        }
+        else{
+            priorityClass = "bg-gray-200 text-gray-600";
+        }
+    })
+}
