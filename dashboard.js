@@ -68,7 +68,7 @@ const displayIssues=(issues)=>{
         "border-t-4 border-purple-500";
 
         const statusIcon = 
-        issue.status = 
+        issue.status ===
         "open"?`<img src ="./assets/Open-Status.png" class="w-5 h-5">`:`<img src="./assets/Closed- Status .png" class="w-5 h-5">`;
 
 
@@ -93,7 +93,7 @@ const displayIssues=(issues)=>{
         card.className=
         `bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition ${borderClass}`;
         
-        card.inclick = () => openModal(issue.id);
+        card.onclick = () => openModal(issue.id);
 
         // card UI content 
         card.innerHTML=
@@ -150,7 +150,7 @@ const setActive = (activeBtn) =>{
 };
 const showAll = () => {
     setActive("allBtn");
-    displayIssues(allIssues);
+    displayIssues(allissues);
 };
 
 
@@ -159,7 +159,7 @@ const showOpen = () => {
     setActive("openBtn");
 
     displayIssues(
-        allIssues.filter(i => i.status === "open")
+        allissues.filter(i => i.status === "open")
     );
 };
 
@@ -169,7 +169,7 @@ const showClosed=()=> {
     setActive("closedBtn");
 
     displayIssues(
-        allIssues.filter(i=>i.status==="closed")
+        allissues.filter(i=>i.status==="closed")
     );
 };
 
@@ -185,3 +185,27 @@ const searchIssues = () =>{
     .then(json => displayIssues(json.data));
 
 };
+
+// modal popup
+
+const openModal = (id)=>{
+    fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
+    .then(res => res.json())
+    .then(json =>{
+        const issue = json.data;
+
+        const statusIcon = issue.status === "open"? `<span class="text-green-500">● Open</span>`
+        : `<span class="text-purple-500">● Closed</span>`;
+
+        document.getElementById("mTitle").innerText = issue.title;
+        document.getElementById("mStatus").innerHTML = statusIcon;
+        document.getElementById("mDesc").innerText = issue.description;
+        document.getElementById("mAuthor").innerText = issue.author;
+        document.getElementById("mPriority").innerText = issue.priority;
+
+        document.getElementById("issueModal").showModal();
+    })
+};
+
+loadIssues();
+setActive("allBtn");
