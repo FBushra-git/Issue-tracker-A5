@@ -3,7 +3,7 @@ const API = "https://phi-lab-server.vercel.app/api/v1/lab/issues";
 // connect html with js
 
 const container= document.getElementById("issuesContainer");
-const spinner = document.getElementById("spinner");
+const spinner = document.getElementById("loading-card");
 const count =document.getElementById("issueCount");
 
 // global storing
@@ -18,25 +18,34 @@ const toggleSpinner = (show)=>{
 // Issues from API
 const loadIssues = ()=>{
     toggleSpinner(true);
+    const start = Date.now();
     
-    fetch(API)
-    .then(res => res.json())
-    .then(json =>{
-        allissues = json.data;
-        displayIssues(allissues);
-        toggleSpinner(false);
-    })
-
-    .catch(err=>{
-        
-        console.error("API Load error:",err);
-        toggleSpinner(false);
-});
+   fetch(API)
+        .then(res => res.json())
+        .then(json => {
+            allissues = json.data;
+            displayIssues(allissues);
+        })
+        .catch(err => {
+            console.error("API Load error:", err);
+        })
+        .finally(() => {
+            const elapsed = Date.now() - start;
+            const remaining = 1500 - elapsed; // 1.5s minimum
+            if (remaining > 0) {
+                setTimeout(() => toggleSpinner(false), remaining);
+            } else {
+                toggleSpinner(false);
+            }
+        });
 
     
-
-
 };
+
+    
+
+
+
 // display issues cards in UI
 const displayIssues=(issues)=>{
     // empty container
@@ -178,33 +187,83 @@ const showClosed=()=> {
 
 const searchIssues = () =>{
     const text = document.getElementById("searchInput").value;
+    toggleSpinner(true);
+    const start = Date.now(); 
     fetch(
         `https://phi-lab-server.vercel.app/api/v1/lab/issues/search?q=${text}`
     )
     .then(res => res.json())
-    .then(json => displayIssues(json.data));
-
+    .then(json => {
+        displayIssues(json.data);
+        toggleSpinner(false); 
+    })
+    .catch(err => {
+        console.error("Search error:", err);
+        toggleSpinner(false); 
+    })
+    .finally(() => {
+            const elapsed = Date.now() - start;
+            const remaining = 1500 - elapsed;
+            if (remaining > 0) {
+                setTimeout(() => toggleSpinner(false), remaining);
+            } else {
+                toggleSpinner(false);
+            }
+        });
 };
 
 // modal popup
 
 const openModal = (id)=>{
+    toggleSpinner(true);
+    const start = Date.now();
     fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
     .then(res => res.json())
     .then(json =>{
         const issue = json.data;
 
-        const statusIcon = issue.status === "open"? `<span class="text-green-500">● Open</span>`
-        : `<span class="text-purple-500">● Closed</span>`;
+        // Format date nicely
+        const createdDate = new Date(issue.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+     
+        //  status UI
+        const statusClass = issue.status === "open"
+            ? "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs"
+            : "bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs"
+        
+        
+        const statusText = issue.status === "open" ? "Opened" : "Closed";
+
+        
 
         document.getElementById("mTitle").innerText = issue.title;
-        document.getElementById("mStatus").innerHTML = statusIcon;
+        document.getElementById("mStatus").innerHTML = `
+          <span class="${statusClass}">${statusText}</span>
+          <span class="text-gray-500">• Opened by ${issue.author}</span>
+          <span class="text-gray-400">• ${createdDate}</span>
+        `;
+        document.getElementById("modal-tags").innerHTML =`
+          <span class="badge bg-red-100 text-red-600 border-none">Bug</span>
+          <span class="badge bg-yellow-100 text-yellow-700 border-none">Help Wanted</span>
+        `;
         document.getElementById("mDesc").innerText = issue.description;
         document.getElementById("mAuthor").innerText = issue.author;
         document.getElementById("mPriority").innerText = issue.priority;
+         
+
 
         document.getElementById("issueModal").showModal();
+        toggleSpinner(false);
     })
+    .catch(error => {
+
+      console.error("Error loading modal:", error);
+      toggleSpinner(false);
+
+    });
 };
 
 loadIssues();

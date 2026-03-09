@@ -34,7 +34,7 @@ class="input input-bordered w-full sm:w-auto"
 placeholder="Search issues...">
 
 <button onclick="searchIssues()" class="btn btn-primary w-full sm:w-auto">
-+ Search Issue
+ Search Issue
 </button>
 
 </div>
@@ -116,11 +116,17 @@ Closed
 
 <!-- SPINNER -->
 
-<div id="spinner" class="flex justify-center hidden">
-
-<span class="loading loading-spinner loading-lg"></span>
-
-</div>
+<!-- Loading Card -->
+        <div
+          id="loading-card"
+          class="hidden fixed inset-0 flex items-center justify-center z-50"
+        >
+          <div
+            class="bg-white p-6 rounded-xl shadow-lg w-40 h-40 flex items-center justify-center"
+          >
+            <span class="loading loading-dots loading-lg text-gray-500"></span>
+          </div>
+        </div>
 
 
 
@@ -139,24 +145,25 @@ class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
 <dialog id="issueModal" class="modal">
 
-<div class="modal-box  w-11/12 max-w-lg">
+<div class="modal-box w-[90%] max-w-lg lg:max-w-2xl rounded-xl p-4 sm:p-6 md:p-8">
 
-<h3 id="mTitle" class="text-xl font-bold mb-2"></h3>
+<h3 id="mTitle" class="text-base sm:text-lg md:text-2xl font-semibold mb-2 truncate"></h3>
 
-<p id="mStatus" class="text-sm mb-3"></p>
+<p id="mStatus" class="flex flex-wrap items-center gap-3 text-[13px] lg:text-[15px] text-gray-500 mb-4"></p>
+<div id="modal-tags" class="flex gap-2 mb-4"></div>
 
-<p id="mDesc" class="text-gray-600 mb-4"></p>
+<p id="mDesc" class="text-gray-600 mb-6"></p>
 
 <div class="grid grid-cols-2 gap-4 bg-gray-100 p-4 rounded">
 
 <div>
-<p class="text-sm text-gray-500">Assignee</p>
-<p id="mAuthor"></p>
+<p class="text-sm text-gray-500">Assignee:</p>
+<p id="mAuthor" class="font-semibold"></p>
 </div>
 
 <div>
-<p class="text-sm text-gray-500">Priority</p>
-<p id="mPriority"></p>
+<p class="text-sm text-gray-500 mb-2">Priority</p>
+<p id="mPriority" class="badge bg-red-500 text-white border-none p-3.5"></p>
 </div>
 
 </div>
@@ -164,7 +171,7 @@ class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 <div class="modal-action">
 
 <form method="dialog">
-<button class="btn btn-primary">Close</button>
+<button class="btn border-none rounded-md bg-purple-600 text-white hover:bg-purple-700">Close</button>
 </form>
 
 </div>
